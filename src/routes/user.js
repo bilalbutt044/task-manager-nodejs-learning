@@ -7,6 +7,7 @@ route.get("/users", (req, res) => {
     .then((users) => res.status(200).send(users))
     .catch((e) => res.status(500).send(e));
 });
+
 route.get("/users/:id", (req, res) => {
   const _id = req.params.id;
 
@@ -22,8 +23,24 @@ route.get("/users/:id", (req, res) => {
 
 route.patch("/users/:id", async (req, res) => {
   const _id = req.params.id;
+
+  const updates = Object.keys(req.body);
+  const allowedUpdates = ["name", "email", "password", "age"];
+  const isValidUpdate = updates.every((update) =>
+    allowedUpdates.includes(update)
+  );
+
+  if (!isValidUpdate) return res.status(400).send({ error: "Invalid Updates" });
+
+  const user = await User.findById(_id);
+  updates.forEach((update) => (user[update] = req.body[update]));
+  await user.save();
+
   try {
-    const user = await User.findByIdAndUpdate({ _id }, req.body, { new: true });
+    // const user = await User.findByIdAndUpdate({ _id }, req.body, {
+    //   new: true,
+    //   runValidators: true,
+    // });
     if (!user) return res.status(400).send(" user not found");
 
     res.send(user);

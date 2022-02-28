@@ -1,6 +1,8 @@
 const validator = require("validator");
+const mongoose = require("mongoose");
+const bycrpt = require("bcryptjs");
 
-const userSchema = {
+const userSchema = new mongoose.Schema({
   name: {
     type: String,
     trim: true,
@@ -37,6 +39,16 @@ const userSchema = {
       }
     },
   },
-};
+});
+
+userSchema.pre("save", async function (next) {
+  const user = this;
+
+  if (user.isModified("password")) {
+    user.password = await bycrpt.hash(user.password, 8);
+  }
+
+  next();
+});
 
 module.exports = userSchema;
