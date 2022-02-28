@@ -67,7 +67,22 @@ route.post("/users", (req, res) => {
     .then(() => {
       res.status(201).send(user);
     })
-    .catch((err) => res.status(400).send(err));
+    .catch((err) => {
+      res.status(400).send(err);
+    });
+});
+
+route.post("/users/login", async (req, res) => {
+  try {
+    const user = await User.findByCredentials(
+      req.body.email,
+      req.body.password
+    );
+
+    res.send(user);
+  } catch (error) {
+    res.status(400).send(error.message);
+  }
 });
 
 module.exports = route;

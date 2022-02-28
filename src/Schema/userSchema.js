@@ -1,6 +1,7 @@
 const validator = require("validator");
 const mongoose = require("mongoose");
-const bycrpt = require("bcryptjs");
+const bcrypt = require("bcryptjs");
+const User = require("../models/user");
 
 const userSchema = new mongoose.Schema({
   name: {
@@ -12,6 +13,7 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true,
     trim: true,
+    unique: true,
     lowercase: true,
     validator(value) {
       if (!validator.isEmail(value)) {
@@ -39,16 +41,6 @@ const userSchema = new mongoose.Schema({
       }
     },
   },
-});
-
-userSchema.pre("save", async function (next) {
-  const user = this;
-
-  if (user.isModified("password")) {
-    user.password = await bycrpt.hash(user.password, 8);
-  }
-
-  next();
 });
 
 module.exports = userSchema;
