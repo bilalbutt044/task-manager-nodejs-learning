@@ -1,11 +1,10 @@
 const express = require("express");
+const auth = require("../middleware/auth");
 const route = express.Router();
 const User = require("../models/user");
 
-route.get("/users", (req, res) => {
-  User.find({})
-    .then((users) => res.status(200).send(users))
-    .catch((e) => res.status(500).send(e));
+route.get("/users/me", auth, (req, res) => {
+  res.send(req.user);
 });
 
 route.get("/users/:id", (req, res) => {
