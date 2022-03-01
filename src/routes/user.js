@@ -60,12 +60,16 @@ route.delete("/users/:id", async (req, res) => {
   }
 });
 
-route.post("/users", (req, res) => {
+route.post("/users", async (req, res) => {
   const user = new User(req.body);
+  const token = await user.generateAuthToken();
   user
     .save()
     .then(() => {
-      res.status(201).send(user);
+      res.status(201).send({
+        user,
+        token,
+      });
     })
     .catch((err) => {
       res.status(400).send(err);
@@ -78,8 +82,11 @@ route.post("/users/login", async (req, res) => {
       req.body.email,
       req.body.password
     );
-
-    res.send(user);
+    const token = await user.generateAuthToken();
+    res.send({
+      user,
+      token,
+    });
   } catch (error) {
     res.status(400).send(error.message);
   }
