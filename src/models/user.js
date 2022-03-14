@@ -4,6 +4,22 @@ const jwt = require("jsonwebtoken");
 
 const userSchema = require("../Schema/userSchema");
 
+userSchema.virtual("tasks", {
+  ref: "Task",
+  localField: "_id",
+  foreignField: "owner",
+});
+
+userSchema.methods.toJSON = function () {
+  const user = this;
+  const userObj = user.toObject();
+
+  delete userObj.tokens;
+  delete userObj.password;
+
+  return userObj;
+};
+
 userSchema.methods.generateAuthToken = async function () {
   const user = this;
 
